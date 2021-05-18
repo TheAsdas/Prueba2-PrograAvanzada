@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CDCC1899-2FA5-40C6-9F50-B2B397D9E1C6}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BombaBencinaThreads</RootNamespace>
-    <AssemblyName>BombaBencinaThreads</AssemblyName>
+    <ProjectGuid>{BEF1A04E-D5F1-4335-88E5-3A94F85EE7E5}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>BombaBencinaClient</RootNamespace>
+    <AssemblyName>BombaBencinaClient</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,14 +44,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientThread.cs" />
+    <Compile Include="Partial\ProgramIdentification.cs" />
+    <Compile Include="Partial\ProgramServerLogic.cs" />
+    <Compile Include="ProgramClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServerThread.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BombaBencinaModel\BombaBencinaModel.csproj">
       <Project>{c4057d56-5785-474a-8cf1-cf4f9c499c6e}</Project>
       <Name>BombaBencinaModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BombaBencinaThreads\BombaBencinaThreads.csproj">
+      <Project>{cdcc1899-2fa5-40c6-9f50-b2b397d9e1c6}</Project>
+      <Name>BombaBencinaThreads</Name>
     </ProjectReference>
     <ProjectReference Include="..\RandomUtils\RandomUtils.csproj">
       <Project>{05710709-ec85-45d7-ba74-d800c58ecde8}</Project>

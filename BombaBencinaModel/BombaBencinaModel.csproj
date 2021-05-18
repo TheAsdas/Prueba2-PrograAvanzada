@@ -41,6 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DAL\ElectricMeterFiles.cs" />
+    <Compile Include="DAL\Factory\ElectricMeterFactory.cs" />
+    <Compile Include="DAL\Factory\ReadingFactory.cs" />
+    <Compile Include="DAL\Factory\TrafficMeterFactory.cs" />
+    <Compile Include="DAL\Interface\IElectricMeter.cs" />
+    <Compile Include="DAL\Interface\IReading.cs" />
+    <Compile Include="DAL\Interface\ITrafficMeter.cs" />
+    <Compile Include="DAL\ReadingFile.cs" />
+    <Compile Include="DAL\TrafficMeterFiles.cs" />
     <Compile Include="DTO\Abstract\History.cs" />
     <Compile Include="DTO\Abstract\Meter.cs" />
     <Compile Include="DTO\ChargePoint.cs" />
@@ -53,8 +62,6 @@
     <Compile Include="DTO\TrafficMeter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DAL\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

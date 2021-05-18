@@ -72,7 +72,7 @@ namespace SocketUtils
             try
             {
                 //Detener la función hasta que el servidor encuentre a un cliente.
-                return new ClientSocket(this.server.Accept());
+                return new ClientSocket(server.Accept());
             }
             catch(Exception e)
             {

@@ -1,6 +1,7 @@
 ﻿using RandomUtils;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 
 namespace SocketUtils
@@ -26,6 +27,24 @@ namespace SocketUtils
             Stream stream = new NetworkStream(this.client);
             this.writer = new StreamWriter(stream);
             this.reader = new StreamReader(stream);
+        }
+
+        public ClientSocket(string ip, int port) : this(CreateSocket(ip, port)) { }
+
+
+        private static Socket CreateSocket(string ip, int port)
+        {
+            Socket newClient = new Socket(
+                    AddressFamily.InterNetwork,
+                    SocketType.Stream,
+                    ProtocolType.Tcp);
+            IPEndPoint endpoint = new IPEndPoint(
+                IPAddress.Parse(ip),
+                port);
+
+            newClient.Connect(endpoint);
+
+            return newClient;
         }
 
         /// <summary>
@@ -68,6 +87,20 @@ namespace SocketUtils
         public void Close()
         {
             client.Close();
+        }
+
+        public void Connect(string ip, int port)
+        {
+            IPEndPoint endPoint = new IPEndPoint(
+                IPAddress.Parse(ip),
+                port);
+
+            client.Connect(endPoint);
+        }
+
+        public bool IsConnected()
+        {
+            return client.Connected;
         }
     }
 }

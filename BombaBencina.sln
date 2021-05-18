@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomUtils", "RandomUtils\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BombaBencinaThreads", "BombaBencinaThreads\BombaBencinaThreads.csproj", "{CDCC1899-2FA5-40C6-9F50-B2B397D9E1C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BombaBencinaClient", "BombaBencinaClient\BombaBencinaClient.csproj", "{BEF1A04E-D5F1-4335-88E5-3A94F85EE7E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{CDCC1899-2FA5-40C6-9F50-B2B397D9E1C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDCC1899-2FA5-40C6-9F50-B2B397D9E1C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDCC1899-2FA5-40C6-9F50-B2B397D9E1C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEF1A04E-D5F1-4335-88E5-3A94F85EE7E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEF1A04E-D5F1-4335-88E5-3A94F85EE7E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEF1A04E-D5F1-4335-88E5-3A94F85EE7E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEF1A04E-D5F1-4335-88E5-3A94F85EE7E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

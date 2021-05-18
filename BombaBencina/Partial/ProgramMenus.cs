@@ -48,6 +48,7 @@ namespace BombaBencinaServer
             allCommands = new Dictionary<string, string>();
 
             allCommands.Add("ayuda", "Muestra todos los comandos.");
+            allCommands.Add("clear", "Limpia la pantalla.");
             allCommands.Add("conectar", "Conecta el servidor en un puerto específicado por usted.");
             allCommands.Add("acerca", "Revisa la información del servidor.");
             allCommands.Add("desconectar", "Desconecta la base de datos.");
@@ -65,7 +66,7 @@ namespace BombaBencinaServer
                     ShowAllCommands();
                     break;
                 case "salir":
-                    Environment.Exit(0);
+                    Environment.Exit(1);
                     break;
                 case "conectar":
                     StartServerInSpecificPort();
@@ -75,6 +76,9 @@ namespace BombaBencinaServer
                     break;
                 case "acerca":
                     ShowServerInfo();
+                    break;
+                case "clear":
+                    Console.Clear();
                     break;
                 default:
                     ConsoleUtils.WriteLineWithColor("Comando inválido. Ocupe 'ayuda' para ver todos los comandos.", ConsoleColor.Yellow);
@@ -105,7 +109,7 @@ namespace BombaBencinaServer
         {
             if (serverThread == null)
             {
-                ConsoleUtils.WriteLineWithColor("¡El servidor no está conectado! Ocupe el comando 'puerto' para crear la conexión.", ConsoleColor.Red);
+                ConsoleUtils.WriteLineWithColor("¡El servidor no está conectado! Ocupe el comando 'conectar' para crear la conexión.", ConsoleColor.Red);
                 return;
             }
 
