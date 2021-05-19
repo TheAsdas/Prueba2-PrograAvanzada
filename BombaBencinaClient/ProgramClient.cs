@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RandomUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,12 +17,19 @@ namespace BombaBencinaClient
         private static void StartClient()
         {
             CreateStation();
-            Identify();
-            ConnectIntoServer();
-            DoClientTask();
 
+            while(true)
+            {
+                Identify();
+                ConnectIntoServer();
+                DoClientTask();
+                CloseConnection();
 
-            CloseConnection();
+                string response = ConsoleUtils.GetConsoleInput("¿Reiniciar cliente? (Si/No)")
+                    .ToLower()
+                    .Trim();
+                if (response == "n" || response == "no") break;
+            }
 
             Console.ReadKey();
         }

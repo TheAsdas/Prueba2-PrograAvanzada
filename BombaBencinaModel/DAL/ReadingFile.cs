@@ -4,13 +4,12 @@ using BombaBencinaModel.DTO.Abstract;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
+using RandomUtils.Exceptions;
 
 namespace BombaBencinaModel.DAL
 {
-    class ReadingFile: IReading
+    public class ReadingFile: IReading
     {
         private static IReading instance;
         private string trafficReadingsDirectory = Directory.GetCurrentDirectory() + "/trafico.txt";
@@ -20,8 +19,6 @@ namespace BombaBencinaModel.DAL
 
         public static IReading GetInstance()
         {
-            if (instance is null) instance = new ReadingFile();
-
             instance = instance ?? new ReadingFile();
             return instance;
         }
@@ -38,7 +35,26 @@ namespace BombaBencinaModel.DAL
 
         public void RegisterReading(History reading)
         {
-            throw new NotImplementedException();
+            string _parsedHistory;
+            StreamWriter _writer;
+
+            switch(reading.GetType().Name)
+            {
+                case "TrafficHistory":
+                    _parsedHistory = JsonSerializer.Serialize(reading as TrafficHistory);
+                    _writer = new StreamWriter(trafficReadingsDirectory, true);
+                    _writer.WriteLine(_parsedHistory);
+                    break;
+                case "ElectricHistory":
+                    _parsedHistory = JsonSerializer.Serialize(reading as ElectricHistory);
+                    _writer = new StreamWriter(electricReadingDirectory, true);
+                    _writer.WriteLine(_parsedHistory);
+                    break;
+                default:
+                    throw new InvalidHistoryException();
+            }
+
+            _writer.Flush();
         }
     }
 }

@@ -4,6 +4,7 @@ using RandomUtils;
 using SocketUtils;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace BombaBencinaClient
 {
@@ -19,11 +20,16 @@ namespace BombaBencinaClient
         /// </summary>
         private static void CreateStation()
         {
+            int _id = Convert.ToInt32(ConfigurationManager.AppSettings["default-station-id"]);
+            int _carCapacity = Convert.ToInt32(ConfigurationManager.AppSettings["default-station-car-capacity"]);
+            float _kwhCapacity = float.Parse(ConfigurationManager.AppSettings["default-station-kwh-capacity"]);
+            ConsoleColor _listColor = ConsoleColor.Cyan;
+
             ChargePoint cp = new ChargePoint() 
             { 
-                Id = 1,
-                CarCapacity = 4,
-                KwhCapacity = 20f,
+                Id = 0,
+                CarCapacity = _carCapacity,
+                KwhCapacity = _kwhCapacity,
                 Type = ChargePointType.ELECTRICO,
             };
 
@@ -32,10 +38,20 @@ namespace BombaBencinaClient
 
             station = new Station()
             {
-                Id = 0,
+                Id = _id,
                 ChargePointCapacity = 1,
                 ChargePoints = cpList,
             };
+
+            Console.WriteLine("Por defecto, se crea una estación de pruebas.");
+            Console.WriteLine("Estos son sus propiedades:");
+            ConsoleUtils.WriteWithColor("ID: ", _listColor);
+            Console.WriteLine(station.Id);
+            ConsoleUtils.WriteWithColor("Capacidad: ", _listColor);
+            Console.WriteLine(string.Format("{0} punto/s de carga\n", station.ChargePointCapacity));
+            Console.WriteLine("Propiedades del punto de carga:");
+            ConsoleUtils.WriteWithColor("Capacidad: ", _listColor);
+            Console.WriteLine(string.Format("{0} autos y {1} kw/h \n", cp.CarCapacity, cp.KwhCapacity));
         }
 
         /// <summary>

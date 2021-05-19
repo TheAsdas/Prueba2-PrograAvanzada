@@ -1,5 +1,6 @@
 ﻿using BombaBencinaModel.DTO;
 using RandomUtils;
+using RandomUtils.Exceptions;
 using SocketUtils;
 using System;
 using System.Configuration;
@@ -12,14 +13,14 @@ namespace BombaBencinaClient
 
         private static void ConnectIntoServer()
         {
-            int port = Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
-            string ip = ConfigurationManager.AppSettings["ip"].ToString();
+            int _port = Convert.ToInt32(ConfigurationManager.AppSettings["port"]);
+            string _ip = ConfigurationManager.AppSettings["ip"].ToString();
 
             try
             {
-                ConsoleUtils.WriteLineWithColor("Conectando con el servidor local en el puerto " + port + "...", ConsoleColor.Yellow);
+                ConsoleUtils.WriteLineWithColor("Conectando con el servidor local en el puerto " + _port + "...", ConsoleColor.Yellow);
 
-                client = new ClientSocket(ip, port);
+                client = new ClientSocket(_ip, _port);
             }
             catch (Exception e)
             {
@@ -51,11 +52,11 @@ namespace BombaBencinaClient
         /// </summary>
         private static void DoClientTask()
         {
-            bool responseIsCorrenct;
+            bool _responseIsCorrect;
 
             SendInitialMessage();
-            RecieveInitialResponse(out responseIsCorrenct);
-            if (responseIsCorrenct) SendUpdateMessage();
+            RecieveInitialResponse(out _responseIsCorrect);
+            if (_responseIsCorrect) SendUpdateMessage();
         }
 
         /// <summary>
@@ -63,44 +64,74 @@ namespace BombaBencinaClient
         /// </summary>
         private static void RecieveInitialResponse(out bool responseIsCorrect)
         {
-            string response = client.Read();
-            string[] data = response.Split('|');
+            string _response = client.Read();
+            string[] _data = _response.Split('|');
 
-            Console.WriteLine(response);
+            Console.WriteLine(_response);
 
-            responseIsCorrect = (data[2] == "WAIT");
+            responseIsCorrect = (_data[2] == "WAIT");
         }
 
         private static void SendUpdateMessage()
         {
-            string id = meter.Id.ToString();
-            string type = meter.GetType().Name;
-            string value;
-            string state;
-            string date = DateUtils.GetDate();
+            string _id = station.Id.ToString();
+            string _type = ParseMeterType(meter.GetType().Name);
+            string _value;
+            string _state;
+            string _date = DateUtils.GetDate();
+            string _message;
 
             if (meter.GetType().Name == "TrafficMeter")
             {
-                value = (meter as TrafficMeter).TotalCars.ToString();
-                client.Write(string.Format("{0}|{1}|{2}|{3}|UPDATE", id, date, type, value));
+                _value = (meter as TrafficMeter).TotalCars.ToString();
+                _message = "{0}|{1}|{2}|{3}|UPDATE";
+                client.Write(string.Format(_message, _id, _date, _type, _value));
             }
             else if (meter.GetType().Name == "ElectricMeter")
             {
-                value = (meter as ElectricMeter).KwhInUse.ToString();
-                state = GetMeterState();
+                _value = (meter as ElectricMeter).KwhInUse.ToString();
+                _state = GetMeterState();
+                _message = "{0}|{1}|{2}|{3}|{4}|UPDATE";
+                client.Write(string.Format(_message, _id, _date, _type, _value, _state));
             }
             else throw new InvalidMeterException();
         }
 
+        /// <summary>
+        /// Verifica el estado del medidor eléctrico y retorna una cadena con el ID del estado.
+        /// </summary>
+        /// <returns>        
+        ///     <list type="bullet">
+        ///         <item>
+        ///             <term>"-1"</term>
+        ///             <description>Error de lectura.</description>
+        ///         </item>
+        ///         <item>
+        ///             <term>"1"</term>
+        ///             <description>Punto de carga lleno.</description>
+        ///         </item>
+        ///         <item>
+        ///             <term>"2"</term>
+        ///             <description>Requiere mantención.</description>
+        ///         </item>
+        ///         <item>
+        ///             <term>"0"</term>
+        ///             <description>Todo correcto.</description>
+        ///         </item>
+        ///     </list>
+        /// </returns>
         private static string GetMeterState()
         {
-            var _meter = meter as ElectricMeter;
-            var _chargePoint = station.ChargePoints[0];
+            ElectricMeter _meter = meter as ElectricMeter;
+            ChargePoint _chargePoint = station.ChargePoints[0];
 
+            /* Los errores de lectura ocurren cuando hay más autos de los
+             * que la estación permite tener, o  cuando está ocupando más
+             * kw/h de los que tiene capacidad */
             if (_meter.CarsParked > _chargePoint.CarCapacity) return "-1";
             else if (_meter.KwhInUse > _chargePoint.KwhCapacity) return "-1";
-            else if (_meter.CarsParked == _chargePoint.CarCapacity) return "1";
             else if (_meter.RequiresMaintenance) return "2";
+            else if (_meter.CarsParked == _chargePoint.CarCapacity) return "1";
 
             return "0";
         }
@@ -111,11 +142,11 @@ namespace BombaBencinaClient
         /// <exception cref="InvalidMeterException">Si el medidor es de una clase no reconocida.</exception>
         private static void SendInitialMessage()
         {
-            string date = DateTime.Now.ToString(dateFormat);
-            string id = meter.Id.ToString();
-            string type = ParseMeterType(meter.GetType().Name);
+            string _date = DateTime.Now.ToString(dateFormat);
+            string _id = meter.Id.ToString();
+            string _type = ParseMeterType(meter.GetType().Name);
 
-            client.Write(string.Format("{0}|{1}|{2}", date, id, type));
+            client.Write(string.Format("{0}|{1}|{2}", _date, _id, _type));
         }
 
         /// <summary>
@@ -137,13 +168,7 @@ namespace BombaBencinaClient
             }
         }
 
-        /// <summary>
-        /// Esta excepción se lanza cuando un medidor no está definido dentro del sistema.
-        /// </summary>
-        private class InvalidMeterException : Exception
-        {
-            public override string Message => "Este medidor es chanta y está hecho en China.";
-        }
+
 
     }
 }

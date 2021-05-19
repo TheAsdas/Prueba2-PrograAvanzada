@@ -1,15 +1,22 @@
 ﻿using BombaBencinaModel.DAL.Interface;
 using BombaBencinaModel.DAL.Factory;
 using RandomUtils;
+using RandomUtils.Exceptions;
 using SocketUtils;
 using System;
+using System.Text.Json;
+using BombaBencinaModel.DTO.Abstract;
+using BombaBencinaModel.DTO;
 
 namespace BombaBencinaThreads
 {
+    
+
     public class ClientThread
     {
         private ClientSocket client;
         private ServerThread server;
+        private static IReading dal = ReadingFactory.CreateDAL();
 
         public ClientThread(
             ClientSocket client,
@@ -24,14 +31,84 @@ namespace BombaBencinaThreads
         /// </summary>
         public void RunClientTask()
         {
-            bool isCorrect;
-            string meterId;
+            bool _isCorrect;
+            string _meterId;
+            string _clientStatus;
 
-            RecieveInitialMessage(out isCorrect, out meterId);
-            SendInitialResponse(isCorrect, meterId);
+            RecieveInitialMessage(out _isCorrect, out _meterId);
+            SendInitialResponse(_isCorrect, _meterId);
+            RecieveClientStatus(out _clientStatus);
+            StoreStatus(_clientStatus);
 
             ConsoleUtils.WriteLineWithColor("Un cliente se ha desconectado...", ConsoleColor.Red);
             server.ConnectedClients.Remove(this);
+        }
+
+        /// <summary>
+        /// Detecta qué tipo de historial es el que se está intentando guardar.
+        /// </summary>
+        /// <param name="clientStatus"></param>
+        private void StoreStatus(string clientStatus)
+        {
+            string[] _data = clientStatus.Split('|');
+
+            switch (_data[2])
+            {
+                case "consumo":
+                    StoreElectricStatus(_data);
+                    break;
+                case "tráfico":
+                    StoreTrafficStatus(_data);
+                    break;
+                default:
+                    throw new InvalidMeterException();
+            }
+        }
+
+        private void StoreTrafficStatus(string[] data)
+        {
+            TrafficHistory _history = new TrafficHistory()
+            {
+                StationId = Convert.ToInt32(data[0]),
+                DateSent = DateUtils.ParseToDateTime(data[1]),
+                CarsParked = Convert.ToInt32(data[3]),
+            };
+
+            lock(dal)
+            {
+                dal.RegisterReading(_history);
+            }
+        }
+
+        /// <summary>
+        /// Genera y guarda una entrada en el historial de medidores eléctricos.
+        /// </summary>
+        /// <param name="data"></param>
+        private void StoreElectricStatus(string[] data)
+        {
+            ElectricHistory _history = new ElectricHistory()
+            {
+                DateSent = DateUtils.ParseToDateTime(data[1]),
+                KwhInUse = float.Parse(data[3]),
+                RequiresMaintenence = data[4] == "2",
+                StationId = Convert.ToInt32(data[0]),
+
+            };
+
+            lock(dal)
+            {
+                dal.RegisterReading(_history);
+            }
+        }
+
+        /// <summary>
+        /// Recibe el mensaje de actualización del cliente y lo guarda en una referencia.
+        /// </summary>
+        /// <param name="clientStatus">Referenncia donde guardar el estatus del cliente.</param>
+        private void RecieveClientStatus(out string clientStatus)
+        {
+            clientStatus = client.Read();
+            Console.WriteLine(clientStatus);
         }
 
         /// <summary>
@@ -41,16 +118,16 @@ namespace BombaBencinaThreads
         /// <param name="meterId">Referencia a la ID del medidor.</param>
         private void RecieveInitialMessage(out bool isCorrect, out string meterId)
         {
-            string initialMessage = client.Read();
-            Console.WriteLine(initialMessage);
+            string _initialMessage = client.Read();
+            Console.WriteLine(_initialMessage);
 
-            string[] data = initialMessage.Split('|');
+            string[] data = _initialMessage.Split('|');
 
             //flags
-            bool a = DateChecksOut(data[0]);
-            bool b = IdChecksOut(data[1], data[2]);
+            bool _a = DateChecksOut(data[0]);
+            bool _b = IdChecksOut(data[1], data[2]);
 
-            isCorrect = (a && b);
+            isCorrect = (_a && _b);
             meterId = data[1];
         }
 
@@ -61,9 +138,9 @@ namespace BombaBencinaThreads
         /// <param name="meterId">ID del medidor conectado.</param>
         private void SendInitialResponse(bool isCorrect, string meterId)
         {
-            string date = DateUtils.GetDate();
-            string status = isCorrect ? "WAIT" : "ERROR"; 
-            client.Write(string.Format("{0}|{1}|{2}", date, meterId, status));
+            string _date = DateUtils.GetDate();
+            string _status = isCorrect ? "WAIT" : "ERROR"; 
+            client.Write(string.Format("{0}|{1}|{2}", _date, meterId, _status));
         }
 
         /// <summary>
@@ -103,10 +180,10 @@ namespace BombaBencinaThreads
         /// <returns><c>True</c> si está está dentro del rango, <c>false</c> en caso contrario.</returns>
         private bool DateChecksOut(string date)
         {
-            DateTime clientTime = DateUtils.ParseToDateTime(date);
-            DateTime timeOut = DateTime.Now.AddMinutes(-30);
+            DateTime _clientTime = DateUtils.ParseToDateTime(date);
+            DateTime _timeOut = DateTime.Now.AddMinutes(-30);
 
-            return (clientTime <= timeOut);
+            return (_clientTime <= _timeOut);
         }
     }
 }

@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleUtils.cs" />
+    <Compile Include="CustomExceptions.cs" />
     <Compile Include="DateUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
